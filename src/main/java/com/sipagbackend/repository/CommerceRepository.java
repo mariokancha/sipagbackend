@@ -6,4 +6,6 @@ import com.sipagbackend.model.Commerce;
 
 public interface CommerceRepository extends JpaRepository<Commerce, Long>{
 
+	
+
 }
