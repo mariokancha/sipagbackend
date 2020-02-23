@@ -1,7 +1,5 @@
 package com.sipagbackend.resource;
 
-
-import java.awt.color.CMMException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -25,6 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.sipagbackend.model.Commerce;
 import com.sipagbackend.repository.CommerceRepository;
+import com.sipagbackend.service.CommerceService;
 
 
 @RestController
@@ -33,6 +33,9 @@ public class CommerceResource {
 
 	@Autowired
 	private CommerceRepository repository;
+	
+	@Autowired
+	private CommerceService commerceService;
 
 	@GetMapping
 	public List<Commerce> listar() {
@@ -64,16 +67,20 @@ public class CommerceResource {
 		 if (commerce != null)
 			return ResponseEntity.ok(commerce);
 		else
-			return ResponseEntity.notFound().build();
-		
+			return ResponseEntity.notFound().build();	
 	 }
+	
 	@DeleteMapping("/{idCommerce}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deletCommerce(@PathVariable Long idCommerce) {
-		repository.deleteById(idCommerce);
-	
+	  	repository.deleteById(idCommerce);
+	  	
 	}
-	 
-
+	
+	@PutMapping("/{idCommerce}")
+	public ResponseEntity<Commerce> atualizar(@PathVariable Long idCommerce, @Valid @RequestBody Commerce commerce) {
+	 Commerce commerceSalva = commerceService.atualizar(idCommerce, commerce);
+	  return  ResponseEntity.ok(commerceSalva);
+	}
 	
 }

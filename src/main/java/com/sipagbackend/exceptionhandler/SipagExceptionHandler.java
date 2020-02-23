@@ -18,7 +18,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -36,7 +35,7 @@ public class SipagExceptionHandler extends ResponseEntityExceptionHandler{
 		
 		String mensagemUsuario = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
 		String mensagemDesenvolvedor = ex.getCause().toString();
-		List<Erro> erros = Arrays.asList( new Erro(mensagemDesenvolvedor, mensagemUsuario));
+		List<Erro> erros = Arrays.asList( new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		return super.handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 
 	}
@@ -53,8 +52,12 @@ public class SipagExceptionHandler extends ResponseEntityExceptionHandler{
 	
 	//Tratamento de exception
 	@ExceptionHandler({EmptyResultDataAccessException.class})
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public void handleEmptyResultDataAccessException() {
+	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request) {
+		
+		String mensagemUsuario = messageSource.getMessage("recurso.nao-encontrado", null, LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ex.toString();
+		List<Erro> erros = Arrays.asList( new Erro(mensagemUsuario, mensagemDesenvolvedor));
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 		
 	}
 	
@@ -81,8 +84,8 @@ public class SipagExceptionHandler extends ResponseEntityExceptionHandler{
 		private String mensagemDesenvolvedor;
 		
 		public Erro(String mensagemUsuario, String mensagemDesenvolvedor) {
-			this.mensagemDesenvolvedor = mensagemDesenvolvedor;
 			this.mensagemUsuario = mensagemUsuario;
+			this.mensagemDesenvolvedor = mensagemDesenvolvedor;
 			
 		}
 
